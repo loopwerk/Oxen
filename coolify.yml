@@ -6,7 +6,7 @@ services:
     image: ghcr.io/loopwerk/oxen:latest
     environment:
       - SERVICE_URL_APP_8000
-      - APP_URL=${SERVICE_URL_APP_8000}
+      - APP_URL=${SERVICE_URL_APP}
       - SECRET_KEY=${SERVICE_PASSWORD_64_SECRETKEY}
       - SETUP_TOKEN=${SERVICE_PASSWORD_SETUPTOKEN}
       - POSTGRES_HOST=postgres
