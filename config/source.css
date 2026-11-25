@@ -68,6 +68,16 @@
     @apply rounded border border-divider bg-white px-3 py-2;
   }
 
+  /* The "Choose File" button looks like btn-accent. */
+  input[type="file"] {
+    @apply file:btn-accent file:mr-3;
+  }
+
+  /* Less padding than btn-accent, as it sits inside the input's own padding. */
+  input[type="file"]::file-selector-button {
+    @apply py-1;
+  }
+
   /* Our own arrow, with room for it: the browser's own sits against the border. */
   select {
     @apply appearance-none bg-no-repeat pr-10;
