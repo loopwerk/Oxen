@@ -13,7 +13,7 @@ from django.utils.decorators import method_decorator
 from django.utils.http import content_disposition_header
 from django.views import View
 from django.views.decorators.clickjacking import xframe_options_sameorigin
-from weasyprint import HTML
+lazy from weasyprint import HTML
 
 from clients.models import Client
 from settings.models import Company
