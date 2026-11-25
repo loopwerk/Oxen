@@ -8,14 +8,13 @@ A simple self-hosted time-tracking and invoicing service, built on Django.
 
 I've used [Harvest](https://www.getharvest.com/) for over ten years, as a freelance developer. It offered everything that I needed, in a neat little package. No feature bloat, nice UI, affordable price.
 
-But over time it has added bloat, added AI integration, changed its UI with a worse version, sold to [Bending Spoons](https://www.reddit.com/r/HarvestApp/comments/1q25xpy/purchase_by_bending_spoons/) and got more expensive. And while Harvest does have a free account (limited to one user and 2 projects), you can't use it to create invoices unless you connect to Stripe to get paid - costing you 2% of your gross revenue!
+But over time it has added bloat, added AI integration, replaced its UI with a worse version, been sold to [Bending Spoons](https://www.reddit.com/r/HarvestApp/comments/1q25xpy/purchase_by_bending_spoons/) and got more expensive. And while Harvest does have a free account (limited to one user and 2 projects), you can't use it to create invoices unless you connect to Stripe to get paid - costing you 2% of your gross revenue!
 
 I went looking for a replacement, but nothing really offered the same minimal features for a low price. If I wanted to self-host something, the list of options got much smaller. So, I decided to build something myself.
 
 ## Features
 
-- Fully open source
-- Self-hosted
+- Fully open source and self-hosted
 - Clients and projects, each with their own currency and VAT rates
 - Multiple users, with two roles available
 - Users can be assigned to specific projects
