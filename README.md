@@ -77,7 +77,7 @@ This will create a PostgreSQL database and start Oxen on http://localhost:8000.
 
 The following environment values can be set:
 
-- `TIME_ZONE`, such as `Europe/Amsterdam`. the default is `UTC`.
+- `TIME_ZONE`, such as `Europe/Amsterdam`. the default is `UTC`. See the [list of timezones](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
 - `UPDATE_CHECK=false` turns off the daily update check.
 
 ## Open source
