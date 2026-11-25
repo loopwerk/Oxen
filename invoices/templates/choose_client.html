@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}New invoice{% endblock %}
+
+{% block content %}
+  <h1>New invoice</h1>
+
+  {% if form.fields.client.queryset.exists %}
+    <form method="get" class="mt-6 flex max-w-lg flex-col gap-4">
+      {{ form }}
+      <div class="flex items-center gap-4">
+        <button type="submit" name="type" value="hours" class="btn-accent">From hours</button>
+        <button type="submit" name="type" value="free-form" class="btn-accent">Free-form</button>
+        <a href="{% url 'invoices:index' %}">Cancel</a>
+      </div>
+    </form>
+  {% else %}
+    <p class="mt-6">
+      You need a client before you can send an invoice. <a href="{% url 'clients:create' %}" class="underline">Add a client first</a>.
+    </p>
+  {% endif %}
+{% endblock %}

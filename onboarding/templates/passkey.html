@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Set up Oxen{% endblock %}
+{% block header %}{% endblock %}
+{% block content %}
+  <div class="mx-auto max-w-sm">
+    <h1>Register a passkey</h1>
+    <p class="mt-2">You'll log in as {{ request.user.username }} with this passkey. There's no password.</p>
+    <div class="mt-6">
+      {% url 'onboarding:company' as next_url %}
+      {% include "passkeys/register.html" with next_url=next_url %}
+    </div>
+  </div>
+{% endblock %}

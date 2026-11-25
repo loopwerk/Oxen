@@ -1,0 +1,39 @@
+{% extends "settings/base.html" %}
+
+{% block settings %}
+  <h2 class="font-semibold">
+    {% if edited_user %}
+      {{ edited_user }}
+    {% else %}
+      New user
+    {% endif %}
+  </h2>
+
+  <form method="post" class="mt-4 flex max-w-lg flex-col gap-4">
+    {% csrf_token %}
+    {{ form }}
+    <div class="flex items-center gap-4">
+      <button type="submit" class="btn-accent">Save</button>
+      <a href="{% url 'settings:users' %}">Cancel</a>
+    </div>
+  </form>
+
+  {% if edited_user %}
+    <h2 class="mt-12 font-semibold">Passkeys</h2>
+    {% if has_passkey %}
+      <p class="mt-1 max-w-lg">
+        If {{ edited_user }} lost their device, reset their passkeys. That logs them out everywhere, and gives you a new
+        setup link to pass on.
+      </p>
+      <form method="post" action="{% url 'settings:user-reset-passkeys' edited_user.pk %}" class="mt-4">
+        {% csrf_token %}
+        <button type="submit" class="btn-accent">Reset passkeys</button>
+      </form>
+    {% else %}
+      <p class="mt-1">
+        {{ edited_user }} hasn't set up a passkey yet.
+        <a href="{% url 'settings:user-setup-link' edited_user.pk %}" class="underline">Show their setup link</a>.
+      </p>
+    {% endif %}
+  {% endif %}
+{% endblock %}

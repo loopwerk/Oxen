@@ -1,0 +1,46 @@
+{% extends "settings/base.html" %}
+
+{% block settings %}
+  <div class="mb-4 flex justify-end">
+    <a href="{% url 'settings:user-create' %}" class="btn-accent">+ User</a>
+  </div>
+
+  <table class="w-full">
+    <thead>
+      <tr class="text-left">
+        <th class="py-2">Name</th>
+        <th>Username</th>
+        <th>Role</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for listed_user in users %}
+        <tr class="border-t border-divider">
+          <td class="py-2">
+            <a href="{% if listed_user == user %}{% url 'users:account' %}{% else %}{% url 'settings:user-edit' listed_user.pk %}{% endif %}"
+               class="underline">{{ listed_user }}</a>
+            {% if listed_user == user %}(you){% endif %}
+          </td>
+          <td>{{ listed_user.username }}</td>
+          <td>
+            {% if listed_user.is_admin %}
+              Admin
+            {% else %}
+              User
+            {% endif %}
+          </td>
+          <td>
+            {% if not listed_user.is_active %}
+              Inactive
+            {% elif not listed_user.has_passkey %}
+              Waiting for setup
+            {% else %}
+              Active
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load hours %}
+
+{% block title %}{{ project }}{% endblock %}
+
+{% block content %}
+  <div class="mb-8 flex items-end gap-4">
+    <div class="flex-1">
+      <a href="{% url 'clients:client' project.client.pk %}" class="underline">{{ project.client }}</a>
+      <h1>
+        {{ project }}
+        {% if project.archived or project.client.archived %}<span class="badge">Archived</span>{% endif %}
+      </h1>
+    </div>
+
+    <details class="menu">
+      {% include "actions_summary.html" %}
+      <div class="menu-items">
+        <a href="{% url 'clients:edit-project' project.pk %}">Edit</a>
+        {% if project.archived %}
+          <form method="post" action="{% url 'clients:unarchive-project' project.pk %}">
+            {% csrf_token %}
+            <button type="submit">Unarchive</button>
+          </form>
+        {% else %}
+          <button type="button" onclick="document.getElementById('archive').showModal()">Archive</button>
+        {% endif %}
+      </div>
+    </details>
+  </div>
+
+  {% include "clients/stats.html" %}
+
+  {% if not project.archived %}
+    <dialog id="archive">
+      <p>
+        Archive {{ project }}?
+        {% if hours.uninvoiced %}
+          Its {{ hours.uninvoiced|hours }} uninvoiced hours won't be offered for invoicing while it's archived.
+        {% endif %}
+      </p>
+      <div class="mt-6 flex items-center gap-4">
+        <form method="post" action="{% url 'clients:archive-project' project.pk %}">
+          {% csrf_token %}
+          <button type="submit" class="btn-accent">Archive project</button>
+        </form>
+        <form method="dialog">
+          <button type="submit" class="cursor-pointer">Cancel</button>
+        </form>
+      </div>
+    </dialog>
+  {% endif %}
+{% endblock %}

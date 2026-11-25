@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load hours %}
+
+{% block title %}{% if invoice %}Invoice {{ invoice.number }}{% else %}New invoice{% endif %}{% endblock %}
+
+{% block content %}
+  <h1>
+    {% if invoice %}
+      Invoice {{ invoice.number }} for {{ client.name }}
+    {% else %}
+      New invoice for {{ client.name }}
+    {% endif %}
+  </h1>
+
+  <form method="post" class="mt-6 flex flex-col gap-8">
+    {% csrf_token %}
+    <div class="max-w-lg">{{ form }}</div>
+
+    <div>
+      <h2 class="font-semibold">Lines</h2>
+      {% if hour_formset %}{{ hour_formset.management_form }}{% endif %}
+      {{ formset.management_form }}
+      {% for error in formset.non_form_errors %}<p class="text-sm text-red-700">{{ error }}</p>{% endfor %}
+
+      <table class="mt-2 w-full [&_input:not([type=checkbox])]:w-full">
+        <thead>
+          <tr class="text-left">
+            <th class="pb-1">Description</th>
+            <th class="w-32 pb-1">Quantity</th>
+            <th class="w-40 pb-1">Unit price</th>
+            {% if formset.can_delete %}<th class="w-20 pb-1">Remove</th>{% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for line in hour_formset %}
+            <tr class="align-top">
+              <td class="py-1 pr-2">
+                {{ line.description }}
+                {% for error in line.description.errors %}<p class="text-sm text-red-700">{{ error }}</p>{% endfor %}
+              </td>
+              <td class="py-1 pr-2">
+                <span class="block py-2">{{ line.minutes|hours }}</span>
+              </td>
+              <td class="py-1 pr-2">
+                {{ line.unit_price }}
+                {% for error in line.unit_price.errors %}<p class="text-sm text-red-700">{{ error }}</p>{% endfor %}
+              </td>
+              {{ line.project }}
+            </tr>
+          {% endfor %}
+          {% for line in formset %}
+            <tr class="align-top">
+              <td class="py-1 pr-2">
+                {{ line.description }}
+                {% for error in line.description.errors %}<p class="text-sm text-red-700">{{ error }}</p>{% endfor %}
+              </td>
+              <td class="py-1 pr-2">
+                {% if line.fields.quantity.disabled %}
+                  <span class="block py-2">{{ line.quantity.value }}</span>
+                {% else %}
+                  {{ line.quantity }}
+                  {% for error in line.quantity.errors %}<p class="text-sm text-red-700">{{ error }}</p>{% endfor %}
+                {% endif %}
+              </td>
+              <td class="py-1 pr-2">
+                {{ line.unit_price }}
+                {% for error in line.unit_price.errors %}<p class="text-sm text-red-700">{{ error }}</p>{% endfor %}
+              </td>
+              {% if formset.can_delete %}
+                <td class="pt-4 text-center">{% if "DELETE" in line.fields %}{{ line.DELETE }}{% endif %}</td>
+              {% endif %}
+              {% for field in line.hidden_fields %}{{ field }}{% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="flex items-center gap-4">
+      <button type="submit" class="btn-accent">Save invoice</button>
+      <a href="{% if invoice %}{% url 'invoices:detail' invoice.pk %}{% else %}{% url 'invoices:index' %}{% endif %}">Cancel</a>
+    </div>
+  </form>
+{% endblock %}

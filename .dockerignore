@@ -1,0 +1,10 @@
+.git
+.venv
+.vscode
+.ruff_cache
+.django_tailwind_cli
+**/__pycache__
+**/*.py[oc]
+config/.env
+static_root
+static/css/tailwind.css

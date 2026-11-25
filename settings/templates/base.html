@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+  <h1>Settings</h1>
+
+  <nav class="tabs">
+    {% with tab=request.resolver_match.url_name %}
+      <a href="{% url 'settings:company' %}" {% if tab == "company" %}aria-current="page"{% endif %}>Company</a>
+      <a href="{% url 'settings:users' %}" {% if "user" in tab %}aria-current="page"{% endif %}>Users</a>
+      <a href="{% url 'settings:about' %}" {% if tab == "about" %}aria-current="page"{% endif %}>About</a>
+    {% endwith %}
+  </nav>
+
+  {% block settings %}{% endblock %}
+{% endblock %}

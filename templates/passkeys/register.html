@@ -1,0 +1,19 @@
+{% load otp_webauthn %}
+{% comment %}
+  django-otp-webauthn's "register a passkey" button. Include it with next_url (where to go once it's registered).
+  Its element ids are fixed, so it can only be on a page once.
+{% endcomment %}
+<template id="passkey-registration-available-template">
+  <button type="button" id="passkey-register-button" class="btn-accent">Register passkey</button>
+  <div id="passkey-register-status-message" class="mt-2"></div>
+</template>
+<template id="passkey-registration-unavailable-template">
+  <p>This browser doesn't support passkeys.</p>
+</template>
+<span id="passkey-registration-placeholder"></span>
+{% render_otp_webauthn_register_scripts %}
+<script>
+  document.addEventListener("otp_webauthn.register_complete", () => {
+    window.location.href = "{{ next_url }}";
+  });
+</script>

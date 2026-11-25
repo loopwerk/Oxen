@@ -1,0 +1,261 @@
+{% load hours money %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Invoice {{ invoice.number }}</title>
+    <style>
+      @page {
+        size: A4;
+        margin: 18mm 18mm 20mm;
+
+        @bottom-center {
+          content: "Page " counter(page) " of " counter(pages);
+          font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+          font-size: 9pt;
+          color: #222;
+        }
+      }
+
+      body {
+        margin: 0;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 8.5pt;
+        line-height: 1.45;
+        color: #222;
+      }
+
+      .top,
+      .meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+
+      .meta {
+        margin-top: 12mm;
+      }
+
+      /* A fixed box the logo is scaled to fit: a square logo is 35mm high, a wide one gets up to 80mm. */
+      .logo img {
+        width: 80mm;
+        height: 35mm;
+        object-fit: contain;
+        object-position: left top;
+      }
+
+      /* "From" and "Invoice For": a grey label, a vertical line, then the name and address. */
+      .party {
+        display: flex;
+        /* The label sits on the same baseline as the first line next to it: the (bigger) name. */
+        align-items: baseline;
+        width: 80mm;
+      }
+
+      .party .label {
+        width: 24mm;
+        padding-right: 3mm;
+        text-align: right;
+        color: #666;
+      }
+
+      .party .content {
+        flex: 1;
+        padding-left: 3mm;
+        border-left: 1px solid #bbb;
+      }
+
+      .name {
+        font-size: 10.5pt;
+        font-weight: bold;
+      }
+
+      .details {
+        margin-top: 1.2em;
+      }
+
+      .facts {
+        border-collapse: collapse;
+      }
+
+      .facts th {
+        padding: 0 8mm 2mm 0;
+        font-weight: normal;
+        text-align: left;
+        color: #666;
+      }
+
+      .facts td {
+        padding: 0 0 2mm 3mm;
+        border-left: 1px solid #bbb;
+      }
+
+      .facts .number {
+        font-weight: bold;
+      }
+
+      .lines {
+        width: 100%;
+        margin-top: 12mm;
+        border-collapse: collapse;
+      }
+
+      .lines th {
+        padding: 1mm 1.5mm;
+        border-bottom: 1px solid #bbb;
+        font-size: 8pt;
+        text-align: left;
+      }
+
+      .lines td {
+        padding: 2.5mm 1.5mm;
+        border-bottom: 1px solid #bbb;
+        vertical-align: top;
+      }
+
+      .lines th + th,
+      .lines td + td {
+        width: 22mm;
+        border-left: 1px solid #bbb;
+        text-align: right;
+      }
+
+      .lines .amount {
+        font-weight: bold;
+      }
+
+      .totals {
+        margin: 5mm 0 0 auto;
+        border-collapse: collapse;
+      }
+
+      .totals th {
+        padding: 1mm 0 1mm 10mm;
+        font-weight: normal;
+        text-align: right;
+        color: #666;
+      }
+
+      .totals td {
+        padding: 1mm 1.5mm 1mm 15mm;
+        font-weight: bold;
+        text-align: right;
+      }
+
+      .totals .due th,
+      .totals .due td {
+        padding-top: 4mm;
+        font-size: 12pt;
+        font-weight: bold;
+        color: #222;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="top">
+      <div class="logo">
+        {% if company.logo_data_uri %}<img src="{{ company.logo_data_uri }}" alt="">{% endif %}
+      </div>
+      <div class="party">
+        <div class="label">From</div>
+        <div class="content">
+          <div class="name">{{ company.name }}</div>
+          {{ company.address_line_1 }}
+          <br>
+          {% if company.address_line_2 %}{{ company.address_line_2 }}<br>{% endif %}
+          {{ company.address_postal_code }} {{ company.address_city }}
+          <br>
+          {{ company.get_address_country_display }}
+          {% if company.vat_number or company.company_details %}
+            <div class="details">
+              {% if company.vat_number %}VAT: {{ company.vat_number }}<br>{% endif %}
+              {{ company.company_details|linebreaksbr }}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="meta">
+      <table class="facts">
+        <tr>
+          <th>Invoice ID</th>
+          <td class="number">{{ invoice.number }}</td>
+        </tr>
+        <tr>
+          <th>Issue Date</th>
+          <td>{{ invoice.issue_date|date:"d/m/Y" }}</td>
+        </tr>
+        <tr>
+          <th>Due Date</th>
+          <td>
+            {{ invoice.due_date|date:"d/m/Y" }}
+            {% if terms_days %}(Net {{ terms_days }}){% else %}(Due on receipt){% endif %}
+          </td>
+        </tr>
+        {% if invoice.subject %}
+          <tr>
+            <th>Subject</th>
+            <td>{{ invoice.subject }}</td>
+          </tr>
+        {% endif %}
+      </table>
+      <div class="party">
+        <div class="label">Invoice For</div>
+        <div class="content">
+          <div class="name">{{ client.name }}</div>
+          {{ client.address_line_1 }}
+          <br>
+          {% if client.address_line_2 %}{{ client.address_line_2 }}<br>{% endif %}
+          {{ client.address_postal_code }} {{ client.address_city }}
+          {% if show_client_country %}<br>{{ client.get_address_country_display }}{% endif %}
+          {% if client.vat_number %}<div class="details">VAT: {{ client.vat_number }}</div>{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <table class="lines">
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th>Quantity</th>
+          <th>Unit Price</th>
+          <th>Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for line in invoice.lines.all %}
+          <tr>
+            <td>{{ line.description|linebreaksbr }}</td>
+            <td>
+              {% if line.minutes is None %}
+                {{ line.quantity|quantity }}
+              {% else %}
+                {{ line.minutes|hours }}
+              {% endif %}
+            </td>
+            <td>{{ line.unit_price|money:invoice.currency }}</td>
+            <td class="amount">{{ line.amount|money:invoice.currency }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <table class="totals">
+      {% if invoice.tax_rate %}
+        <tr>
+          <th>Subtotal</th>
+          <td>{{ invoice.subtotal|money:invoice.currency }}</td>
+        </tr>
+        <tr>
+          <th>Tax ({{ invoice.tax_rate|percentage }})</th>
+          <td>{{ invoice.tax|money:invoice.currency }}</td>
+        </tr>
+      {% endif %}
+      <tr class="due">
+        <th>Amount Due</th>
+        <td>{{ invoice.total|money:invoice.currency }}</td>
+      </tr>
+    </table>
+  </body>
+</html>

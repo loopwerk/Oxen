@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load otp_webauthn %}
+{% block title %}Log in{% endblock %}
+{% block header %}{% endblock %}
+{% block content %}
+  <div class="mx-auto max-w-sm">
+    <h1>Log in</h1>
+    <form class="mt-6 flex flex-col gap-4">
+      {{ form }}
+      <template id="passkey-verification-available-template">
+        <button type="button" id="passkey-verification-button" class="btn-accent">Log in with a passkey</button>
+        <div id="passkey-verification-status-message"></div>
+      </template>
+      <template id="passkey-verification-unavailable-template">
+        <p>This browser doesn't support passkeys.</p>
+      </template>
+      <span id="passkey-verification-placeholder"></span>
+    </form>
+  </div>
+  {% render_otp_webauthn_auth_scripts username_field_selector="input[name='username']" %}
+{% endblock %}

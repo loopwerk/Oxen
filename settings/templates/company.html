@@ -1,0 +1,16 @@
+{% extends "settings/base.html" %}
+
+{% block settings %}
+  <form method="post" enctype="multipart/form-data" class="flex max-w-lg flex-col gap-4">
+    {% csrf_token %}
+    {% for field in form %}
+      {% if field.name == "logo" and company.logo_data_uri %}
+        <img src="{{ company.logo_data_uri }}" alt="Current logo" class="max-h-24 max-w-48 object-contain object-left">
+      {% endif %}
+      {{ field.as_field_group }}
+    {% endfor %}
+    <div>
+      <button type="submit" class="btn-accent">Save</button>
+    </div>
+  </form>
+{% endblock %}

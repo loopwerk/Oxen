@@ -1,0 +1,43 @@
+# For Coolify: it generates the SERVICE_* values (the URL, user, passwords) and keeps them between deployments.
+# Outside Coolify, use docker-compose.yml instead.
+
+services:
+  app:
+    image: ghcr.io/loopwerk/oxen:latest
+    environment:
+      - SERVICE_URL_APP_8000
+      - APP_URL=${SERVICE_URL_APP_8000}
+      - SECRET_KEY=${SERVICE_PASSWORD_64_SECRETKEY}
+      - SETUP_TOKEN=${SERVICE_PASSWORD_SETUPTOKEN}
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=${POSTGRES_DB:-app}
+      - POSTGRES_USER=${SERVICE_USER_POSTGRES}
+      - POSTGRES_PASSWORD=${SERVICE_PASSWORD_POSTGRES}
+      - TIME_ZONE=${TIME_ZONE:-UTC}
+      - UPDATE_CHECK=${UPDATE_CHECK:-true}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://127.0.0.1:8000/users/login/"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  postgres:
+    image: postgres:17-alpine
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=${SERVICE_USER_POSTGRES}
+      - POSTGRES_PASSWORD=${SERVICE_PASSWORD_POSTGRES}
+      - POSTGRES_DB=${POSTGRES_DB:-app}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres-data:

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="flex flex-wrap items-center gap-4 mb-8">
+    <h1 class="flex-1">Clients & Projects</h1>
+
+    <form method="get" class="heading-select">
+      <select name="status" aria-label="Status" onchange="this.form.submit()">
+        <option value="active">Active</option>
+        <option value="archived" {% if archived %}selected{% endif %}>Archived</option>
+      </select>
+    </form>
+
+    {% if clients or archived %}
+      <a href="{% url 'clients:create' %}" class="btn-accent">+ Client</a>
+    {% endif %}
+  </div>
+
+  {% if clients %}
+    {% for client in clients %}
+      <div class="mb-4">
+        <div class="flex bg-navbg p-2 items-center">
+          <h2 class="flex-1"><a href="{% url 'clients:client' client.pk %}">{{ client.name }}</a></h2>
+          {% if not archived %}
+            <a href="{% url 'clients:create-project' client.pk %}" class="btn-accent">+ Project</a>
+          {% endif %}
+        </div>
+
+        <div class="p-2">
+          {% for project in client.listed_projects %}
+            <h3><a href="{% url 'clients:project' project.pk %}">{{ project.name }}</a></h3>
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+  {% elif archived %}
+    <div class="empty-state">
+      <p>Nothing is archived.</p>
+    </div>
+  {% elif all_archived %}
+    <div class="empty-state">
+      <p>All your clients are archived.</p>
+      <a href="{% url 'clients:create' %}" class="btn-accent">Add a client</a>
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <p>You haven't added any clients or projects yet!</p>
+      <a href="{% url 'clients:create' %}" class="btn-accent">Add your first client</a>
+    </div>
+  {% endif %}
+{% endblock %}

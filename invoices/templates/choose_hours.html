@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}New invoice{% endblock %}
+
+{% block content %}
+  <h1>New invoice for {{ client.name }}</h1>
+
+  {% if form.fields.projects.queryset.exists %}
+    <form method="get" class="mt-6 flex max-w-lg flex-col gap-4">
+      {{ form }}
+      <div class="flex items-center gap-4">
+        <button type="submit" class="btn-accent">Continue</button>
+        <a href="{% url 'invoices:index' %}">Cancel</a>
+      </div>
+    </form>
+  {% else %}
+    <p class="mt-6">
+      {{ client.name }} has no uninvoiced hours. <a href="{% url 'invoices:create' client.pk %}"
+                                                    class="underline">Make a free-form invoice instead</a>.
+    </p>
+  {% endif %}
+{% endblock %}

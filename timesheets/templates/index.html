@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load hours %}
+
+{% block title %}Timesheet{% endblock %}
+
+{% block content %}
+  <div class="flex flex-wrap items-baseline gap-4 md:gap-8 md:h-17.5 mb-8">
+    <div class="flex-1">
+      <h1>{% if not this_week_url %}This week:{% endif %} {{ week_range }}</h1>
+      {% if this_week_url %}
+        <a href="{{ this_week_url }}" class="underline">Back to this week</a>
+      {% endif %}
+    </div>
+
+    {% if users %}
+      <form method="get" class="heading-select">
+        <select name="user" aria-label="User" onchange="this.form.submit()">
+          {% for option in users %}
+            <option value="{{ option.username }}" {% if option == week_user %}selected{% endif %}>{{ option }}</option>
+          {% endfor %}
+        </select>
+      </form>
+    {% endif %}
+
+    <nav class="flex gap-1" aria-label="Weeks">
+      <a href="{{ previous_url }}" class="btn-accent" aria-label="Previous week">←</a>
+      <a href="{{ next_url }}" class="btn-accent" aria-label="Next week">→</a>
+    </nav>
+  </div>
+
+  {% if form.rows %}
+    <form method="post">
+      {% csrf_token %}
+      {% if form.errors %}<p class="mb-6 text-red-700">Some hours couldn't be read. Use hours like 1:30 or 1.5.</p>{% endif %}
+
+      <div class="week-row week-head">
+        <div class="week-project"></div>
+        {% for day in form.days %}
+          <div class="week-cell">
+            <span class="font-normal text-sm">{{ day|date:"D" }}</span>
+            <br>
+            {{ day|date:"j" }}
+          </div>
+        {% endfor %}
+        <div class="week-total">Total</div>
+      </div>
+
+      {% for row in form.rows %}
+        <div class="week-row">
+          <div class="week-project"><span class="font-bold">{{ row.project }}</span> ({{ row.project.client }})</div>
+          {% for cell in row.cells %}
+            <div class="week-cell">
+              {% if cell.field %}
+                {{ cell.field }}
+              {% elif cell.invoiced %}
+                <span title="Invoiced">{{ cell.minutes|hours }}</span>
+              {% else %}
+                {{ cell.minutes|hours }}
+              {% endif %}
+            </div>
+          {% endfor %}
+          <div class="week-total">{{ row.total|hours }}</div>
+        </div>
+      {% endfor %}
+
+      <div class="week-row week-foot">
+        <div class="week-project">Total</div>
+        {% for total in form.day_totals %}<div class="week-cell">{{ total|hours }}</div>{% endfor %}
+        <div class="week-total">{{ form.week_total|hours }}</div>
+      </div>
+
+      {% if form.fields %}<button type="submit" class="btn-accent mt-6">Save</button>{% endif %}
+    </form>
+  {% elif week_user != user %}
+    <div class="empty-state">
+      <p>{{ week_user }} isn't assigned to any active projects.</p>
+    </div>
+  {% elif user.is_admin %}
+    {% if has_clients %}
+      <div class="empty-state">
+        <p>Please add your first project to track time.</p>
+        <a href="{% url 'clients:index' %}" class="btn-accent">Add your first project</a>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <p>Please add your first client and project to track time.</p>
+        <a href="{% url 'clients:create' %}" class="btn-accent">Add your first client</a>
+      </div>
+    {% endif %}
+  {% else %}
+    <div class="empty-state">
+      <p>You're not assigned to any projects yet. Ask an admin.</p>
+    </div>
+  {% endif %}
+{% endblock %}

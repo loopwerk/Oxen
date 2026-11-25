@@ -1,0 +1,29 @@
+{% extends "settings/base.html" %}
+{% load static %}
+
+{% block settings %}
+  <div class="mx-auto flex max-w-md flex-col items-center gap-4 py-8 text-center [&_a]:underline">
+    <img src="{% static 'oxen.svg' %}" alt="" class="h-12">
+    <div>
+      <h2>version {{ version }}</h2>
+      {% if update_available %}
+        <p>
+          Version {{ latest_version }} is available. <a href="{{ changelog_url }}">Release notes</a>
+        </p>
+      {% elif latest_version %}
+        <p>You're up to date</p>
+      {% endif %}
+    </div>
+    <p>
+      A simple self-hosted time-tracking and invoicing service,
+      <br>
+      built on Django.
+    </p>
+    <p>Made by <a href="https://www.loopwerk.io">Loopwerk</a> · MIT license</p>
+    <p class="flex flex-wrap justify-center gap-x-6 gap-y-2">
+      <a href="{{ repository_url }}">Source code</a>
+      <a href="{{ changelog_url }}">Release notes</a>
+      <a href="{{ issues_url }}">Report a problem</a>
+    </p>
+  </div>
+{% endblock %}

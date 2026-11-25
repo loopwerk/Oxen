@@ -1,0 +1,21 @@
+{% extends "settings/base.html" %}
+
+{% block settings %}
+  <h2 class="font-semibold">Setup link for {{ edited_user }}</h2>
+  <p class="mt-1 max-w-lg">
+    Pass this link on to {{ edited_user }}. It works once, for an hour, and lets them register a passkey to log in with.
+  </p>
+
+  <div class="mt-4 flex max-w-2xl gap-2">
+    <input id="setup-link" type="text" readonly value="{{ link }}" aria-label="Setup link" class="flex-1">
+    <button type="button"
+            class="btn-accent"
+            onclick="navigator.clipboard.writeText(document.getElementById('setup-link').value); this.textContent = 'Copied';">
+      Copy
+    </button>
+  </div>
+
+  <p class="mt-6">
+    <a href="{% url 'settings:users' %}" class="underline">Back to users</a>
+  </p>
+{% endblock %}

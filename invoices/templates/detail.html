@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load hours %}
+
+{% block title %}Invoice {{ invoice.number }}{% endblock %}
+
+{% block content %}
+  <div class="mb-4 flex items-start gap-4">
+    <h1 class="flex-1">Invoice {{ invoice.number }} for {{ invoice.client.name }}</h1>
+
+    <details class="menu">
+      {% include "actions_summary.html" %}
+      <div class="menu-items">
+        <a href="{% url 'invoices:pdf' invoice.pk %}?download">Download PDF</a>
+        <a href="{% url 'invoices:edit' invoice.pk %}">Edit</a>
+        <button type="button" onclick="document.getElementById('delete-invoice').showModal()">Delete</button>
+      </div>
+    </details>
+  </div>
+
+  <div class="mb-8 flex flex-wrap items-center gap-4">
+    {% if invoice.paid_on %}
+      <span>Paid on {{ invoice.paid_on|date:"d/m/Y" }}</span>
+      <form method="post" action="{% url 'invoices:mark-unpaid' invoice.pk %}">
+        {% csrf_token %}
+        <button type="submit" class="btn-link">Mark as unpaid</button>
+      </form>
+    {% else %}
+      <form method="post" action="{% url 'invoices:mark-paid' invoice.pk %}" class="input-group">
+        {% csrf_token %}
+        {{ paid_form.paid_on }}
+        <button type="submit" class="btn-accent">Mark as paid</button>
+        {% for error in paid_form.paid_on.errors %}<p class="text-sm text-red-700">{{ error }}</p>{% endfor %}
+      </form>
+    {% endif %}
+  </div>
+
+  <dialog id="delete-invoice">
+    <p>
+      Delete invoice {{ invoice.number }}?
+      {% if tracked_minutes %}Its {{ tracked_minutes|hours }} hours become uninvoiced again.{% endif %}
+    </p>
+    <div class="mt-6 flex items-center gap-4">
+      <form method="post" action="{% url 'invoices:delete' invoice.pk %}">
+        {% csrf_token %}
+        <button type="submit" class="btn-accent">Delete invoice</button>
+      </form>
+      <form method="dialog">
+        <button type="submit" class="cursor-pointer">Cancel</button>
+      </form>
+    </div>
+  </dialog>
+
+  <iframe src="{% url 'invoices:pdf' invoice.pk %}"
+          title="Invoice {{ invoice.number }}"
+          class="min-h-96 w-full flex-1 border border-divider"></iframe>
+{% endblock %}

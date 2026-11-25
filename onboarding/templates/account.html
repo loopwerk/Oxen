@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Set up Oxen{% endblock %}
+{% block header %}{% endblock %}
+{% block content %}
+  <div class="mx-auto max-w-sm">
+    <h1>Welcome</h1>
+    <p class="mt-2">Enter the setup token from your server's configuration, and choose a username.</p>
+    <form method="post" class="mt-6 flex flex-col gap-4">
+      {% csrf_token %}
+      {{ form }}
+      <button type="submit" class="btn-accent">Continue</button>
+    </form>
+  </div>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% load hours money %}
+
+<div class="grid gap-4 md:grid-cols-3">
+  <div class="stat-card">
+    <h2>Total hours</h2>
+    <p class="stat">{{ hours.all_time|hours }}</p>
+    <dl>
+      <dt>This week</dt>
+      <dd>
+        {{ hours.week|hours }}
+      </dd>
+      <dt>This month</dt>
+      <dd>
+        {{ hours.month|hours }}
+      </dd>
+      <dt>This year</dt>
+      <dd>
+        {{ hours.year|hours }}
+      </dd>
+    </dl>
+  </div>
+
+  <div class="stat-card">
+    <h2>Invoiced hours</h2>
+    <p class="stat">
+      {{ hours.invoiced|hours }}
+      {% for currency, amount in invoiced_amounts.items %}
+        · {{ amount|money:currency }}
+      {% endfor %}
+    </p>
+  </div>
+
+  <div class="stat-card">
+    <h2>Uninvoiced hours</h2>
+    <p class="stat">
+      {{ hours.uninvoiced|hours }}
+      {% if uninvoiced_amount is not None %}· {{ uninvoiced_amount|money:currency }}{% endif %}
+    </p>
+    {% if project %}
+      {% if project.hourly_rate is None %}
+        <p>
+          No hourly rate. <a href="{% url 'clients:edit-project' project.pk %}" class="underline">Set one</a>
+        </p>
+      {% endif %}
+    {% elif unrated_projects %}
+      <p>
+        No hourly rate:
+        {% for unrated in unrated_projects %}
+          <a href="{% url 'clients:edit-project' unrated.pk %}" class="underline">{{ unrated }}</a>{% if not forloop.last %},{% endif %}
+        {% endfor %}
+      </p>
+    {% endif %}
+    {% if can_invoice %}
+      <div class="mt-4 flex">
+        {% if project %}
+          <a href="{% url 'invoices:choose-hours' project.client.pk %}?project={{ project.pk }}" class="btn-accent">New invoice</a>
+        {% else %}
+          <a href="{% url 'invoices:choose-hours' client.pk %}" class="btn-accent">New invoice</a>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</div>

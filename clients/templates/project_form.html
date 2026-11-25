@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}{% if project %}{{ project }}{% else %}New project{% endif %}{% endblock %}
+
+{% block content %}
+  <h1>{% if project %}{{ project }}{% else %}New project{% endif %}</h1>
+
+  <form method="post" class="mt-6 flex max-w-lg flex-col gap-4">
+    {% csrf_token %}
+    {{ form }}
+    <div class="flex items-center gap-4">
+      <button type="submit" class="btn-accent">Save project</button>
+      <a href="{% if project %}{% url 'clients:project' project.pk %}{% else %}{% url 'clients:index' %}{% endif %}">Cancel</a>
+    </div>
+  </form>
+{% endblock %}

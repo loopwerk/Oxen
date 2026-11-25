@@ -1,0 +1,13 @@
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+.django_tailwind_cli
+.venv
+.vscode
+.ruff_cache
+config/.env
+static_root
+static/css/tailwind.css

@@ -1,0 +1,256 @@
+@import "tailwindcss";
+
+@theme {
+  --color-accent: #f1a948;
+  --color-bodybg: #fefbf6;
+  --color-textfg: #2b2b2b;
+  --color-navbg: #fbe9cf;
+  --color-divider: #d1d5dc;
+
+  --breakpoint-*: initial;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+}
+
+@utility container {
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+@utility btn-accent {
+  @apply rounded bg-accent px-4 py-2 font-semibold cursor-pointer;
+
+  &:hover {
+    @apply inset-shadow-sm inset-shadow-black/25;
+  }
+
+  &:disabled {
+    @apply bg-[#cccccc] cursor-not-allowed;
+  }
+}
+
+/* A form button that looks like a link, for actions such as "Remove". */
+@utility btn-link {
+  @apply cursor-pointer underline;
+}
+
+/* An input with its button attached on the right. */
+@utility input-group {
+  @apply flex;
+
+  & input {
+    @apply rounded-r-none border-accent border-r-0;
+  }
+
+  & button {
+    @apply rounded-l-none;
+  }
+}
+
+@layer base {
+  a[aria-current="page"] {
+    @apply text-accent;
+  }
+
+  header a:hover {
+    @apply underline;
+  }
+
+  input:not(
+    [type="checkbox"],
+    [type="radio"],
+    [type="submit"],
+    [type="button"],
+    [type="hidden"]
+  ),
+  select,
+  textarea {
+    @apply rounded border border-divider bg-white px-3 py-2;
+  }
+
+  /* Our own arrow, with room for it: the browser's own sits against the border. */
+  select {
+    @apply appearance-none bg-no-repeat pr-10;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-size: 1.5em 1.5em;
+  }
+
+  h1 {
+    @apply text-2xl font-bold;
+  }
+
+  h2 {
+    @apply text-xl font-medium;
+  }
+
+  h3 {
+    @apply text-lg font-medium;
+  }
+
+  /* Tailwind's reset takes away the margin that centers a dialog. */
+  dialog {
+    @apply m-auto max-w-md rounded-lg bg-white p-6 text-textfg;
+  }
+
+  dialog::backdrop {
+    @apply bg-black/50;
+  }
+
+  /* The invoice page: its PDF takes the rest of the screen. */
+  body.invoices:has(iframe) {
+    @apply flex h-dvh flex-col;
+  }
+
+  body.invoices:has(iframe) main {
+    @apply flex min-h-0 w-full flex-1 flex-col;
+  }
+
+  /* A menu that opens without JavaScript: a <details> with the items below its <summary>. */
+  .menu {
+    @apply relative;
+  }
+
+  .menu summary {
+    @apply flex list-none items-center gap-1;
+  }
+
+  .menu summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .menu-items {
+    @apply absolute right-0 z-10 mt-1 flex min-w-40 flex-col rounded border border-divider bg-white py-1 shadow-md;
+  }
+
+  /* Full width, also for a button inside a form. */
+  .menu-items a,
+  .menu-items button {
+    @apply w-full cursor-pointer px-4 py-2 text-left hover:bg-navbg;
+  }
+
+  .empty-state {
+    @apply bg-[#eeeeee] p-8 text-center rounded-lg mx-auto max-w-lg;
+  }
+
+  .empty-state p {
+    @apply mb-4 last:mb-0;
+  }
+
+  /* The form with a select in a page's heading, such as the Timesheet's user. On phones: its own row, under the rest. */
+  .heading-select {
+    @apply order-last basis-full md:order-0 md:basis-auto;
+  }
+
+  /* Links to the sections of a page, such as Settings. The current one has aria-current="page". */
+  .tabs {
+    @apply my-8 flex gap-6 border-b border-divider pb-2 font-semibold;
+  }
+
+  .stat-card {
+    @apply rounded-lg border border-divider bg-white p-4;
+  }
+
+  .stat-card h2 {
+    @apply text-base font-normal;
+  }
+
+  .stat-card .stat {
+    @apply text-2xl font-bold;
+  }
+
+  .stat-card dl {
+    @apply mt-2 grid grid-cols-[1fr_auto] gap-x-4;
+  }
+
+  .stat-card dd {
+    @apply text-right font-semibold;
+  }
+
+  /* A status label, such as an invoice's status or "Archived". Grey unless a variant says otherwise. */
+  .badge {
+    @apply rounded bg-gray-100 px-2 py-0.5 text-sm font-normal text-gray-700;
+  }
+
+  .badge-paid {
+    @apply bg-green-100 text-green-800;
+  }
+
+  .badge-overdue {
+    @apply bg-red-100 text-red-800;
+  }
+
+  label.required {
+    @apply font-bold;
+  }
+
+  .week-row {
+    @apply grid grid-cols-7 items-center gap-1 border-b border-divider py-2;
+    @apply md:grid-cols-[minmax(0,1fr)_repeat(7,4.5rem)_4.5rem] md:gap-2;
+  }
+
+  .week-project {
+    @apply col-span-6 row-start-1 md:col-span-1 md:row-start-auto;
+  }
+
+  .week-cell {
+    @apply text-center;
+  }
+
+  .week-cell input {
+    @apply w-full px-1 text-center;
+  }
+
+  .week-cell input[aria-invalid="true"] {
+    @apply border-red-700;
+  }
+
+  .week-total {
+    @apply col-start-7 row-start-1 text-right font-semibold md:col-start-auto md:row-start-auto;
+  }
+
+  /* On phones, the header only has the days. */
+  .week-head .week-project,
+  .week-head .week-total {
+    @apply hidden md:block;
+  }
+
+  .week-head,
+  .week-foot {
+    @apply font-semibold;
+  }
+
+  .week-foot {
+    @apply border-b-0;
+  }
+
+  /* Messages after an action, over the page so nothing shifts. Only the toasts themselves take clicks. */
+  .toasts {
+    @apply pointer-events-none fixed inset-x-0 bottom-4 z-20 flex flex-col items-center gap-2 px-4;
+  }
+
+  .toast {
+    @apply pointer-events-auto flex max-w-md items-center gap-4 rounded-lg border border-divider bg-white px-4 py-3 text-green-800 shadow-md;
+  }
+
+  /* A success goes away by itself. Hidden at the end, so it doesn't take clicks either. */
+  .toast:not(.toast-error) {
+    animation: toast-out 0.3s ease-in 4s forwards;
+  }
+
+  /* An error stays until it's closed. */
+  .toast-error {
+    @apply text-red-700;
+  }
+
+  .toast button {
+    @apply cursor-pointer text-lg leading-none;
+  }
+}
+
+@keyframes toast-out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}

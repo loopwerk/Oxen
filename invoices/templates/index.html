@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load money %}
+
+{% block content %}
+  <div class="mb-8 flex flex-wrap items-center gap-4">
+    <h1 class="flex-1">Invoices</h1>
+
+    <form method="get" class="heading-select">
+      <select name="status" aria-label="Status" onchange="this.form.submit()">
+        <option value="all">All</option>
+        <option value="open" {% if status == "open" %}selected{% endif %}>Open</option>
+        <option value="overdue" {% if status == "overdue" %}selected{% endif %}>Overdue</option>
+        <option value="paid" {% if status == "paid" %}selected{% endif %}>Paid</option>
+      </select>
+    </form>
+
+    {% if clients and invoices or clients and status %}
+      <a href="{% url 'invoices:choose-client' %}" class="btn-accent">+ Invoice</a>
+    {% endif %}
+  </div>
+
+  {% if invoices %}
+    <table class="w-full">
+      <thead>
+        <tr class="text-left">
+          <th class="py-2">Number</th>
+          <th>Client</th>
+          <th>Issue date</th>
+          <th>Status</th>
+          <th class="text-right">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for invoice in invoices %}
+          <tr class="border-t border-divider">
+            <td class="py-2">
+              <a href="{% url 'invoices:detail' invoice.pk %}" class="underline">{{ invoice.number }}</a>
+            </td>
+            <td>{{ invoice.client.name }}</td>
+            <td>{{ invoice.issue_date|date:"d/m/Y" }}</td>
+            <td>
+              <span class="badge badge-{{ invoice.status }}">{{ invoice.status|capfirst }}</span>
+            </td>
+            <td class="text-right">{{ invoice.total|money:invoice.currency }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% elif not clients %}
+    <div class="empty-state">
+      <p>Please add your first client to create an invoice.</p>
+      <a href="{% url 'clients:create' %}" class="btn-accent">Add your first client</a>
+    </div>
+  {% elif status %}
+    <div class="empty-state">
+      <p>No {{ status }} invoices.</p>
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <p>No invoices yet.</p>
+      <a href="{% url 'invoices:choose-client' %}" class="btn-accent">Create your first invoice</a>
+    </div>
+  {% endif %}
+{% endblock %}

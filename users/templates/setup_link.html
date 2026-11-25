@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Set up your account{% endblock %}
+{% block header %}{% endblock %}
+{% block content %}
+  <div class="mx-auto max-w-sm">
+    {% if link_user %}
+      <h1>Welcome, {{ link_user }}</h1>
+      <p class="mt-2">You'll log in as {{ link_user.username }}, with a passkey instead of a password. Continue to set one up.</p>
+      <form method="post" class="mt-6">
+        {% csrf_token %}
+        <button type="submit" class="btn-accent">Continue</button>
+      </form>
+    {% else %}
+      <h1>This link doesn't work</h1>
+      <p class="mt-2">It has already been used, or it's more than an hour old. Ask an admin for a new one.</p>
+    {% endif %}
+  </div>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Set up Oxen{% endblock %}
+{% block header %}{% endblock %}
+{% block content %}
+  <div class="mx-auto max-w-sm">
+    <h1>Your company</h1>
+    <p class="mt-2">These details go on your invoices. You can change them later in Settings.</p>
+    <form method="post" enctype="multipart/form-data" class="mt-6 flex flex-col gap-4">
+      {% csrf_token %}
+      {{ form }}
+      <button type="submit" class="btn-accent">Continue</button>
+    </form>
+  </div>
+{% endblock %}

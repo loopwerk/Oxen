@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Your account{% endblock %}
+{% block content %}
+  <h1>Your account</h1>
+
+  <form method="post" class="mt-6 flex max-w-lg flex-col gap-4">
+    {% csrf_token %}
+    {{ form }}
+    <div>
+      <button type="submit" class="btn-accent">Save</button>
+    </div>
+  </form>
+
+  <form method="post" action="{% url 'users:logout' %}" class="mt-12">
+    {% csrf_token %}
+    <button type="submit" class="btn-link">Log out</button>
+  </form>
+{% endblock %}

@@ -1,0 +1,47 @@
+# For Docker Compose outside Coolify (on Coolify, use coolify.yml). Set the values in a .env file next to this one.
+# Oxen listens on http://localhost:8000; put a reverse proxy with HTTPS in front of it for anything beyond that.
+
+services:
+  app:
+    image: ghcr.io/loopwerk/oxen:latest
+    restart: unless-stopped
+    # Only on this machine: from elsewhere, it's reached through the reverse proxy.
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      - APP_URL=${APP_URL:-http://localhost:8000}
+      - SECRET_KEY=${SECRET_KEY:?Set SECRET_KEY in .env}
+      - SETUP_TOKEN=${SETUP_TOKEN:?Set SETUP_TOKEN in .env}
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=${POSTGRES_DB:-oxen}
+      - POSTGRES_USER=${POSTGRES_USER:-oxen}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-oxen}
+      - TIME_ZONE=${TIME_ZONE:-UTC}
+      - UPDATE_CHECK=${UPDATE_CHECK:-true}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://127.0.0.1:8000/users/login/"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-oxen}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-oxen}
+      - POSTGRES_DB=${POSTGRES_DB:-oxen}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres-data:

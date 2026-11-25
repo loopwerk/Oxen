@@ -1,0 +1,21 @@
+<div class="flex flex-col gap-1">
+  {% if field.widget_type == "checkbox" %}
+    <div class="flex items-center gap-2">
+      {{ field }}
+      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+    </div>
+  {% else %}
+    <label for="{{ field.id_for_label }}" class="{% if field.field.required %} required{% endif %}">{{ field.label }}</label>
+    {{ field }}
+  {% endif %}
+  {% if field.help_text %}
+    <p id="{{ field.auto_id }}_helptext" class="text-sm">{{ field.help_text|safe }}</p>
+  {% endif %}
+  {% if field.errors %}
+    <ul id="{{ field.auto_id }}_error" class="text-sm text-red-700">
+      {% for error in field.errors %}
+        <li>{{ error }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+</div>

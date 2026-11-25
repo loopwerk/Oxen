@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load hours %}
+
+{% block title %}{{ client }}{% endblock %}
+
+{% block content %}
+  <div class="mb-8 flex items-end gap-4">
+    <h1 class="flex-1">
+      {{ client }}
+      {% if client.archived %}<span class="badge">Archived</span>{% endif %}
+    </h1>
+
+    <details class="menu">
+      {% include "actions_summary.html" %}
+      <div class="menu-items">
+        <a href="{% url 'clients:edit' client.pk %}">Edit</a>
+        {% if client.archived %}
+          <form method="post" action="{% url 'clients:unarchive' client.pk %}">
+            {% csrf_token %}
+            <button type="submit">Unarchive</button>
+          </form>
+        {% else %}
+          <button type="button" onclick="document.getElementById('archive').showModal()">Archive</button>
+        {% endif %}
+      </div>
+    </details>
+  </div>
+
+  {% include "clients/stats.html" %}
+
+  {% if not client.archived %}
+    <dialog id="archive">
+      <p>
+        Archive {{ client }}?
+        {% if hours.uninvoiced %}
+          Its {{ hours.uninvoiced|hours }} uninvoiced hours won't be offered for invoicing while it's archived.
+        {% endif %}
+      </p>
+      <div class="mt-6 flex items-center gap-4">
+        <form method="post" action="{% url 'clients:archive' client.pk %}">
+          {% csrf_token %}
+          <button type="submit" class="btn-accent">Archive client</button>
+        </form>
+        <form method="dialog">
+          <button type="submit" class="cursor-pointer">Cancel</button>
+        </form>
+      </div>
+    </dialog>
+  {% endif %}
+{% endblock %}
